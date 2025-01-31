@@ -1,10 +1,21 @@
 import { AreaChart } from "recharts";
 import Chart from "../components/Chart";
+import PemasukanIcon from "../assets/Icons/pemasukan.svg";
 import Sidebar from "../components/Sidebar";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
+    const info = [
+        { title: "Pemasukan", Icon: PemasukanIcon }
+    ];
+
+    const navigate = useNavigate();
+    const handleNavigate = (path) => {
+        navigate(path);
+    };
+
     return (
-        <div className="relative min-h-screen">
+        <section className="relative min-h-screen">
             <Sidebar />
             <div className="ml-56 p-8">
                 <div className="flex justify-between text-left">
@@ -12,8 +23,8 @@ function Dashboard() {
                         Dashboard
                     </h1>
                     <div className="text-right">
-                        <h2 className="text-base font-semibold font-jakarta ">
-                            Hello, User !
+                        <h2 className="text-base font-semibold font-jakarta">
+                            Hello, User!
                         </h2>
                         <p className="-translate-y-2 font-jakarta">
                             Role &gt; Admin
@@ -21,8 +32,31 @@ function Dashboard() {
                     </div>
                 </div>
                 <div className="w-full h-0.5 mx-auto opacity-25 bg-black"></div>
+
+                <div className="flex items-center">
+                    <div className="w-[40%] h-72 bg-black rounded-xl flex flex-col">
+                        <div className="">
+                            {info.map((data, index) => (
+                                <div key={index} className="flex items-center p-4 gap-3">
+                                    <img src={data.Icon} alt={data.title} />
+                                    <p className="text-white font-jakarta text-xl">{data.title}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <Chart />
+                        <div className="flex justify-between items-center mt-4">
+                            <div></div>
+                            <button
+                                className="text-white  w-32 rounded-md text-lg font-jakarta"
+                                onClick={() => handleNavigate('/pemasukan')}
+                            >
+                                Detail &gt;
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
     );
 }
 
