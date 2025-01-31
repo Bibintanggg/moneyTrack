@@ -1,8 +1,10 @@
 import { AreaChart } from "recharts";
-import Chart from "../components/Chart";
+import IncomeChart from "../components/IncomeChart"
+import OutcomeChart from "../components/OutcomeChart"
 import PemasukanIcon from "../assets/Icons/pemasukan.svg";
 import Sidebar from "../components/Sidebar";
 import { useNavigate } from "react-router-dom";
+import CardInfo from "../components/CardInfo";
 
 function Dashboard() {
     const info = [
@@ -33,29 +35,18 @@ function Dashboard() {
                 </div>
                 <div className="w-full h-0.5 mx-auto opacity-25 bg-black"></div>
 
-                <div className="flex items-center">
-                    <div className="w-[40%] h-72 bg-black rounded-xl flex flex-col">
-                        <div className="">
-                            {info.map((data, index) => (
-                                <div key={index} className="flex items-center p-4 gap-3">
-                                    <img src={data.Icon} alt={data.title} />
-                                    <p className="text-white font-jakarta text-xl">{data.title}</p>
-                                </div>
-                            ))}
-                        </div>
-                        <Chart />
-                        <div className="flex justify-between items-center mt-4">
-                            <div></div>
-                            <button
-                                className="text-white  w-32 rounded-md text-lg font-jakarta"
-                                onClick={() => handleNavigate('/pemasukan')}
-                            >
-                                Detail &gt;
-                            </button>
-                        </div>
-                    </div>
+
+                <CardInfo
+                info={info}
+                ChartComponent={IncomeChart}
+                onDetailClick={() => handleNavigate("/pemasukan")}/>
+
+                <CardInfo
+                info={info}
+                ChartComponent={OutcomeChart}
+                onDetailClick={() => handleNavigate("/pengeluaran")}/>
                 </div>
-            </div>
+
         </section>
     );
 }
