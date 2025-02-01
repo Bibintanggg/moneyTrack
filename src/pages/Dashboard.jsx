@@ -2,14 +2,18 @@ import { AreaChart } from "recharts";
 import IncomeChart from "../components/IncomeChart"
 import OutcomeChart from "../components/OutcomeChart"
 import PemasukanIcon from "../assets/Icons/pemasukan.svg";
+import PengeluaranIcon from "../assets/Icons/pengeluaran.svg"
 import Sidebar from "../components/Sidebar";
 import { useNavigate } from "react-router-dom";
 import CardInfo from "../components/CardInfo";
 
 function Dashboard() {
     const info = [
-        { title: "Pemasukan", Icon: PemasukanIcon }
+        { title: "Pemasukan", Icon: PemasukanIcon },
     ];
+    const Pengeluaran = [
+        { title: "Pengeluaran", Icon: PengeluaranIcon },
+    ]
 
     const navigate = useNavigate();
     const handleNavigate = (path) => {
@@ -30,21 +34,28 @@ function Dashboard() {
                         </h2>
                         <p className="-translate-y-2 font-jakarta">
                             Role &gt; Admin
-                        </p>
+                        </p> 
                     </div>
                 </div>
                 <div className="w-full h-0.5 mx-auto opacity-25 bg-black"></div>
 
+                <div className="flex gap-4 w-full pt-10">
+                    <div className="flex-1 min-w-[300px]">
+                        <CardInfo
+                            info={info}
+                            ChartComponent={IncomeChart}
+                            onDetailClick={() => handleNavigate("/pemasukan")}
+                        />
+                    </div>
+                    <div className="flex-1 min-w-[300px]">
+                        <CardInfo
+                            info={Pengeluaran}
+                            ChartComponent={OutcomeChart}
+                            onDetailClick={() => handleNavigate("/pengeluaran")}
+                        />
+                    </div>
+                </div>
 
-                <CardInfo
-                info={info}
-                ChartComponent={IncomeChart}
-                onDetailClick={() => handleNavigate("/pemasukan")}/>
-
-                <CardInfo
-                info={info}
-                ChartComponent={OutcomeChart}
-                onDetailClick={() => handleNavigate("/pengeluaran")}/>
                 </div>
 
         </section>
