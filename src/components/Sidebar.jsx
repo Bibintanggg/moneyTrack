@@ -17,7 +17,7 @@ function Sidebar() {
     const navigate = useNavigate();
     return (
         <aside>
-            <div className="w-56 h-[41rem] bg-black fixed">
+            <div className="w-56 h-screen bg-black fixed">
                 <div className="">
                     <section className="flex flex-col items-center p-10">
                         <div className="w-20 h-20 bg-white"></div>
