@@ -6,7 +6,7 @@ import DeleteView from "../components/Modal/DeleteView";
 import DetailView from "../components/Modal/DetailView";
 
 function Outcome() {
-    const fields = ["nominal", "tanggal"];
+    const fields = ["nominal", "tanggal", "keterangan"];
 
     const [open, setOpen] = useState({
         add: false,
@@ -18,8 +18,9 @@ function Outcome() {
         {
             id: 1,
             sumber: "Hamba Allah",
-            nominal: "Rp. 100.000.000,00",
+            nominal: "Rp. 100.000",
             tanggal: "20/10/24",
+            keterangan: "Jajan"
         },
     ]);
     const [currentActivity, setCurrentActivity] = useState(null);
