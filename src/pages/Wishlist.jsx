@@ -1,59 +1,66 @@
-import { useEffect, useState } from "react"
-import Sidebar from "../components/Sidebar"
+import { useEffect, useState } from "react";
+import Sidebar from "../components/Sidebar";
 import AddView from "../components/Modal/AddView";
 
 function Wishlist() {
     const [wishlists, setWishlists] = useState(() => {
         const storedData = localStorage.getItem("wishlists");
         return storedData ? JSON.parse(storedData) : [];
-    })
+    });
 
-    const [open, setOpen] = useState({
-        add: false
-    })
-
-    const [currentWishlists, setCurrentWishlists] = useState(null)
+    const [open, setOpen] = useState({ add: false });
 
     useEffect(() => {
-        localStorage.setItem("wisthlisths", JSON.stringify(wishlists));
-    }, [wishlists])
+        localStorage.setItem("wishlists", JSON.stringify(wishlists));
+    }, [wishlists]);
 
     const getNextId = () => {
-        if(wishlists.length === 0) return 1;
-        const maxId = Math.max(...wishlists.map((wish) => wish.id));
-        return maxId + 1;
-    }
+        return wishlists.length === 0 ? 1 : Math.max(...wishlists.map((w) => w.id)) + 1;
+    };
 
     const handleAdd = (newWish) => {
+        const cleanedPrice = newWish.targetPrice.replace(/\./g, "")
+        const targetPrice = parseFloat(cleanedPrice) || 0; 
+        if (targetPrice <= 0) {
+            alert("Masukkan harga yang valid!"); 
+            return;
+        }
+
         const updatedWishlists = [
             ...wishlists,
-            {...newWish, 
+            {
                 id: getNextId(),
-                savedAmount: 0, //ini saat belum menabung
-                progress: 0, //ini progress awalnya
+                title: newWish.title,
+                targetPrice: targetPrice,
+                savedAmount: 0,
+                progress: 0
             },
         ];
         setWishlists(updatedWishlists);
-        setOpen({...open, add:false});
-    }
+        setOpen({ ...open, add: false });
+    };
+
 
     const handleDelete = (id) => {
-        setWishlists(wishlists.filter((wish) => wish.id !== id))
-        setOpen({ ...open, delete: false })
-    }
+        const updatedWishlists = wishlists.filter((wish) => wish.id !== id);
+        setWishlists(updatedWishlists);
+    };
 
-    const handleMoney = (id, amount) => {
+    const handleSaveMoney = (id) => {
+        const amount = parseInt(prompt("Masukkan jumlah tabungan:", "10000"));
+        if (!amount || amount <= 0) return;
+
         const updatedWishlists = wishlists.map((wish) => {
-            if(wish.id === id) {
-                const newSavedAmount = wish.saved + amount;
-                const newProgress = Math.min((newSavedAmount / wish.targetPrice) * 100, 100);
-                return { ...wish, savedAmount: newSavedAmount, progress: newProgress}
+            if (wish.id === id) {
+                const newSavedAmount = wish.savedAmount + amount;
+                const newProgress = Math.min((newSavedAmount / wish.targetPrice) * 100, 100); // Maksimal 100%
+                return { ...wish, savedAmount: newSavedAmount, progress: newProgress };
             }
             return wish;
         });
-        setWishlists(updatedWishlists)
-    };
 
+        setWishlists(updatedWishlists);
+    };
 
     return (
         <section className="relative min-h-screen flex">
@@ -61,16 +68,10 @@ function Wishlist() {
 
             <div className="p-8 ml-56 w-full">
                 <div className="flex justify-between text-left">
-                    <h1 className="text-base font-semibold font-jakarta pt-2">
-                        Wishlist
-                    </h1>
+                    <h1 className="text-base font-semibold font-jakarta pt-2">Wishlist</h1>
                     <div className="text-right">
-                        <h2 className="text-base font-semibold font-jakarta">
-                            Hello, User!
-                        </h2>
-                        <p className="-translate-y-2 font-jakarta">
-                            Role &gt; Admin
-                        </p>
+                        <h2 className="text-base font-semibold font-jakarta">Hello, User!</h2>
+                        <p className="-translate-y-2 font-jakarta">Role &gt; Admin</p>
                     </div>
                 </div>
                 <div className="w-full h-0.5 mx-auto opacity-25 bg-black"></div>
@@ -79,7 +80,7 @@ function Wishlist() {
                     {wishlists.map((wish) => (
                         <div key={wish.id} className="p-6 bg-white shadow rounded-lg">
                             <div
-                                className="radial-progress mx-auto text-xl font-bold"
+                                className="radial-progress mx-auto ml-[5.5rem] text-xl font-bold"
                                 style={{
                                     "--value": wish.progress,
                                     "--size": "8rem",
@@ -89,26 +90,22 @@ function Wishlist() {
                             >
                                 {Math.round(wish.progress)}%
                             </div>
-                            <h2 className="text-center text-lg font-semibold mt-4">
-                                {wish.title}
-                            </h2>
+                            <h2 className="text-center text-lg font-semibold mt-4">{wish.title}</h2>
                             <p className="text-center text-sm text-gray-500">
-                                Ditabung: Rp {wish.savedAmount.toLocaleString()} / Rp {wish.targetPrice.toLocaleString()}
+                                Ditabung: Rp {(wish.savedAmount || 0).toLocaleString()} / Rp {(wish.targetPrice || 0).toLocaleString()}
                             </p>
+
                             <div className="flex justify-between mt-4">
                                 <button
-                                    className="px-4 py-2 text-white bg-gray-600 rounded hover:bg-gray-400 transition-all duration-200"
-                                    onClick={() => {
-                                        const amount = parseInt(prompt("Masukkan jumlah tabungan:", "10000"));
-                                        if (!isNaN(amount) && amount > 0) {
-                                            handleSaveMoney(wish.id, amount);
-                                        }
-                                    }}
+                                    className="px-4 py-2 text-white bg-gray-800 rounded hover:bg-gray-600 
+                                    transition-all duration-200"
+                                    onClick={() => handleSaveMoney(wish.id)}
                                 >
                                     Tambah Tabungan
                                 </button>
                                 <button
-                                    className="px-4 py-2 text-white bg-gray-800 rounded hover:bg-gray-600 transition-all duration-200"
+                                    className="px-4 py-2 text-white bg-gray-500 rounded hover:bg-gray-300 
+                                    transition-all duration-200"
                                     onClick={() => handleDelete(wish.id)}
                                 >
                                     Hapus
@@ -133,7 +130,7 @@ function Wishlist() {
                 />
             </div>
         </section>
-    )
+    );
 }
 
-export default Wishlist
+export default Wishlist;
