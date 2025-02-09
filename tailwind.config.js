@@ -10,8 +10,7 @@ export default {
       fontFamily: {
         jakarta: ["Plus Jakarta Sans", "sans-serif"],
       },
-      
     },
   },
-  plugins: [],
+  plugins: [require("daisyui"),],
 };
