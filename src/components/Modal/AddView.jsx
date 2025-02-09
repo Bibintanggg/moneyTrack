@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Modal from "./Modal";
-import Swal from "sweetalert2"; 
+import Swal from "sweetalert2";
 
-function AddView({ open, onClose, onSubmit, fields, activity }) {
+function AddView({ open, onClose, onSubmit, fields }) {
     const [formData, setFormData] = useState(
         fields.reduce((acc, field) => {
             acc[field] = "";
@@ -11,10 +11,13 @@ function AddView({ open, onClose, onSubmit, fields, activity }) {
     );
 
     useEffect(() => {
-        if (activity) {
-            setFormData(activity); 
+        if (!open) {
+            setFormData(fields.reduce((acc, field) => {
+                acc[field] = "";
+                return acc;
+            }, {}));
         }
-    }, [activity]);
+    }, [open, fields]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -24,8 +27,9 @@ function AddView({ open, onClose, onSubmit, fields, activity }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         const isValid = fields.every((field) => formData[field]);
+
         if (isValid) {
-            onSubmit(formData);
+            onSubmit({ ...formData, id: Date.now() });
             Swal.fire({
                 position: "center",
                 icon: "success",
@@ -33,6 +37,7 @@ function AddView({ open, onClose, onSubmit, fields, activity }) {
                 showConfirmButton: false,
                 timer: 1500,
             });
+            onClose();
         } else {
             Swal.fire({
                 position: "center",
@@ -45,11 +50,7 @@ function AddView({ open, onClose, onSubmit, fields, activity }) {
     };
 
     return (
-        <Modal
-            open={open}
-            onClose={onClose}
-            title="Tambah Data"
-        >
+        <Modal open={open} onClose={onClose} title="Tambah Data">
             <form className="space-y-4" onSubmit={handleSubmit}>
                 {fields.map((field, index) => (
                     <input
