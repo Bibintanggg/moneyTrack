@@ -8,7 +8,7 @@ function Wishlist() {
             <div className="p-8 ml-56 w-full">
                 <div className="flex justify-between text-left">
                     <h1 className="text-base font-semibold font-jakarta pt-2">
-                        Pengeluaran
+                        Wishlist
                     </h1>
                     <div className="text-right">
                         <h2 className="text-base font-semibold font-jakarta">
