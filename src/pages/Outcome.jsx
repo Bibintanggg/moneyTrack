@@ -1,12 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import AddView from "../components/Modal/AddView";
 import EditView from "../components/Modal/EditView";
 import DeleteView from "../components/Modal/DeleteView";
 import DetailView from "../components/Modal/DetailView";
 
-function Outcome() {
-    const fields = ["nominal", "tanggal", "keterangan"];
+function Income() {
+    const fields = ["sumber", "nominal", "tanggal", "keterangan"];
+
+    const [activities, setActivities] = useState(() => {
+        const storedData = localStorage.getItem("activities");
+        return storedData ? JSON.parse(storedData) : [];
+    });
 
     const [open, setOpen] = useState({
         add: false,
@@ -14,22 +19,25 @@ function Outcome() {
         delete: false,
         view: false,
     });
-    const [activities, setActivities] = useState([
-        {
-            id: 1,
-            sumber: "Hamba Allah",
-            nominal: "Rp. 100.000",
-            tanggal: "20/10/24",
-            keterangan: "Jajan"
-        },
-    ]);
+
     const [currentActivity, setCurrentActivity] = useState(null);
 
+    useEffect(() => {
+        localStorage.setItem("activities", JSON.stringify(activities));
+    }, [activities]);
+
+    const getNextId = () => {
+        if (activities.length === 0) return 1;
+        const maxId = Math.max(...activities.map((activity) => activity.id));
+        return maxId + 1;
+    };
+
     const handleAdd = (newActivity) => {
-        setActivities([
+        const updatedActivities = [
             ...activities,
-            { ...newActivity, id: activities.length + 1 },
-        ]);
+            { ...newActivity, id: getNextId() },
+        ];
+        setActivities(updatedActivities);
         setOpen({ ...open, add: false });
     };
 
@@ -48,9 +56,10 @@ function Outcome() {
     };
 
     return (
-        <section className="relative min-h-screen">
+        <section className="relative min-h-screen flex">
             <Sidebar />
-            <div className="ml-56 p-8">
+
+            <div className="ml-56 p-8 w-full">
                 <div className="flex justify-between text-left">
                     <h1 className="text-base font-semibold font-jakarta pt-2">
                         Pengeluaran
@@ -161,4 +170,4 @@ function Outcome() {
     );
 }
 
-export default Outcome;
+export default Income;
