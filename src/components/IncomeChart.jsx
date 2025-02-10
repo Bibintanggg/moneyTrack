@@ -7,82 +7,61 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ReferenceLine,
   ResponsiveContainer,
 } from 'recharts';
-
-const data = [
-  {
-    name: 'Januari',
-    Pemasukan: 2400,
-    amt: 2400,
-  },
-  {
-    name: 'Februari',
-    Pemasukan: 1398,
-    amt: 2210,
-  },
-  {
-    name: 'Maret',
-    Pemasukan: 9800,
-    amt: 2290,
-  },
-  {
-    name: 'April',
-    Pemasukan: 3908,
-    amt: 2000,
-  },
-  {
-    name: 'Mei',
-    uv: 1890,
-    Pemasukan: 4800,
-    amt: 2181,
-  },
-  {
-    name: 'Juni',
-    Pemasukan: 3800,
-    amt: 2500,
-  },
-  {
-    name: 'Juli',
-    Pemasukan: 4300,
-    amt: 2100,
-  },
-    {
-        name: 'Agustus',
-        Pemasukan: 2400,
-        amt: 2400,
-    },
-    {
-        name: 'September',
-        Pemasukan: 1398,
-        amt: 2210,
-    },
-    {
-        name: 'Oktober',
-        Pemasukan: 9800,
-        amt: 2290,
-    },
-    {
-        name: 'November',
-        Pemasukan: 3908,
-        amt: 2000,
-    },
-    {
-        name: 'Desember',
-        uv: 1890,
-        Pemasukan: 4800,
-        amt: 2181,
-    },
-];
 
 export default class Example extends PureComponent {
   static demoUrl = 'https://codesandbox.io/p/sandbox/line-chart-width-xaxis-padding-v3w7s9';
 
+  state = {
+    chartData: []
+  };
+
+  componentDidMount() {
+    this.processData();
+    window.addEventListener('storage', this.processData);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('storage', this.processData);
+  }
+
+  processData = () => {
+    const incomeData = JSON.parse(localStorage.getItem('incomeActivities')) || [];
+    const monthlyData = {
+      'Januari': 0, 'Februari': 0, 'Maret': 0, 'April': 0,
+      'Mei': 0, 'Juni': 0, 'Juli': 0, 'Agustus': 0,
+      'September': 0, 'Oktober': 0, 'November': 0, 'Desember': 0
+    };
+
+    incomeData.forEach(item => {
+      if (!item.tanggal) return; 
+
+      const date = new Date(item.tanggal);
+      if (isNaN(date.getTime())) return; 
+
+      const month = date.toLocaleString('id-ID', { month: 'long' });
+
+      if (monthlyData[month] !== undefined) {
+        monthlyData[month] += Number(item.nominal) || 0; // Pastikan nominal selalu angka
+      }
+    });
+
+    this.setState({
+      chartData: Object.entries(monthlyData).map(([name, Pemasukan]) => ({
+        name,
+        Pemasukan,
+        amt: Pemasukan
+      }))
+    });
+  };
+
+
+
   render() {
     return (
       <ResponsiveContainer width="90%" height="65%">
-        <LineChart width={500} height={300} data={data}>
+        <LineChart width={500} height={300} data={this.state.chartData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" padding={{ left: 30, right: 30 }} />
           <YAxis />

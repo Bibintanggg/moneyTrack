@@ -33,19 +33,40 @@ function Income() {
     };
 
     const handleAdd = (newActivity) => {
-        setIncomeActivities([...incomeActivities, { ...newActivity, id: getNextId() }]);
+        const formattedDate = new Date(newActivity.tanggal); // Pastikan ini objek Date
+
+        if (isNaN(formattedDate.getTime())) {
+            alert("Format tanggal tidak valid!");
+            return;
+        }
+
+        setIncomeActivities([...incomeActivities, {
+            ...newActivity,
+            tanggal: formattedDate.toISOString().split("T")[0], 
+            id: getNextId()
+        }]);
+
+        setTimeout(() => {
+            window.dispatchEvent(new Event("storage")); // Supaya chart update langsung
+        }, 500);
+
         setOpen({ ...open, add: false });
     };
+
+
+
 
     const handleEdit = (updatedActivity) => {
         setIncomeActivities(
             incomeActivities.map((activity) => (activity.id === updatedActivity.id ? updatedActivity : activity))
         );
+        window.dispatchEvent(new Event("storage"));
         setOpen({ ...open, edit: false });
     };
 
     const handleDelete = (id) => {
         setIncomeActivities(incomeActivities.filter((activity) => activity.id !== id));
+        window.dispatchEvent(new Event("storage"));
         setOpen({ ...open, delete: false });
     };
 
@@ -85,10 +106,28 @@ function Income() {
                     </tbody>
                 </table>
                 <button className="fixed p-4 text-white bg-green-600 rounded-full shadow-lg bottom-6 right-6 hover:bg-green-700" onClick={() => setOpen({ ...open, add: true })}>+</button>
-                <AddView open={open.add} onClose={() => setOpen({ ...open, add: false })} onSubmit={handleAdd} fields={fields} />
-                <EditView open={open.edit} onClose={() => setOpen({ ...open, edit: false })} onSubmit={handleEdit} fields={fields} activity={currentActivity} />
-                <DeleteView open={open.delete} onClose={() => setOpen({ ...open, delete: false })} onSubmit={() => handleDelete(currentActivity.id)} activity={currentActivity} />
-                <DetailView open={open.view} onClose={() => setOpen({ ...open, view: false })} fields={fields} data={currentActivity} />
+                <AddView 
+                open={open.add} 
+                onClose={() => setOpen({ ...open, add: false })} 
+                onSubmit={handleAdd} 
+                fields={fields} />
+
+                <EditView 
+                open={open.edit} 
+                onClose={() => setOpen({ ...open, edit: false })} 
+                onSubmit={handleEdit} fields={fields} 
+                activity={currentActivity} />
+
+                <DeleteView 
+                open={open.delete} onClose={() => setOpen({ ...open, delete: false })} 
+                onSubmit={() => handleDelete(currentActivity.id)} 
+                activity={currentActivity} />
+
+                <DetailView 
+                open={open.view} 
+                onClose={() => setOpen({ ...open, view: false })} 
+                fields={fields} 
+                data={currentActivity} />
             </div>
         </section>
     );

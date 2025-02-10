@@ -55,13 +55,14 @@ function AddView({ open, onClose, onSubmit, fields }) {
                 {fields.map((field, index) => (
                     <input
                         key={index}
-                        type="text"
+                        type={field === "tanggal" ? "date" : "text"} // Pastikan input tanggal pakai type="date"
                         name={field}
                         placeholder={field}
                         value={formData[field]}
                         onChange={handleChange}
                         className="w-full p-2 border rounded"
                     />
+
                 ))}
                 <div className="flex justify-end space-x-2">
                     <button
