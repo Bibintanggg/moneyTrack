@@ -1,103 +1,72 @@
-import { useEffect, useState } from "react";
-import Modal from "./Modal";
-import Swal from "sweetalert2";
+import React, { useEffect, useState } from "react";
+import { 
+    AreaChart, 
+    Area, 
+    XAxis, 
+    YAxis, 
+    CartesianGrid, 
+    Tooltip, 
+    ResponsiveContainer 
+} from "recharts";
 
-function AddView({ open, onClose, onSubmit, fields }) {
-    const [formData, setFormData] = useState(
-        fields.reduce((acc, field) => {
-            acc[field] = "";
-            return acc;
-        }, {})
-    );
+export default function OutcomeChart() {
+    const [chartData, setChartData] = useState([]);
 
     useEffect(() => {
-        if (!open) {
-            setFormData(fields.reduce((acc, field) => {
-                acc[field] = "";
-                return acc;
-            }, {}));
-        }
-    }, [open, fields]);
+        processOutcomeData(); // Panggil fungsi saat pertama kali komponen dirender
+        window.addEventListener("storage", processOutcomeData); // Update jika ada perubahan di localStorage
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+        return () => {
+            window.removeEventListener("storage", processOutcomeData); // Hapus listener saat komponen unmount
+        };
+    }, []);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const isValid = fields.every((field) => formData[field]);
-    
-        if (isValid) {
-            const newData = { ...formData, id: Date.now() };
-    
-            // Ambil data lama dari localStorage
-            const existingData = JSON.parse(localStorage.getItem("incomeActivities")) || [];
-            const updatedData = [...existingData, newData];
-    
-            // Simpan ke localStorage
-            localStorage.setItem("incomeActivities", JSON.stringify(updatedData));
-    
-            // Trigger event storage agar chart ter-update
-            window.dispatchEvent(new Event("storage"));
-    
-            // Panggil onSubmit agar state utama juga update
-            onSubmit(newData);
-    
-            Swal.fire({
-                position: "center",
-                icon: "success",
-                title: "Berhasil menambahkan data",
-                showConfirmButton: false,
-                timer: 1500,
-            });
-    
-            onClose();
-        } else {
-            Swal.fire({
-                position: "center",
-                icon: "error",
-                title: "Pastikan semua input terisi dengan benar!",
-                showConfirmButton: false,
-                timer: 1500,
-            });
-        }
+    const processOutcomeData = () => {
+        const outcomeData = JSON.parse(localStorage.getItem("outcomeActivities")) || [];
+        const monthlyData = {
+            Januari: 0, 
+            Februari: 0, 
+            Maret: 0, 
+            April: 0,
+            Mei: 0, 
+            Juni: 0, 
+            Juli: 0, 
+            Agustus: 0,
+            September: 0, 
+            Oktober: 0, 
+            November: 0, 
+            Desember: 0
+        };
+
+        outcomeData.forEach(item => {
+            if (!item.tanggal) return;
+
+            const date = new Date(item.tanggal);
+            if (isNaN(date.getTime())) return;
+
+            const month = date.toLocaleString("id-ID", { month: "long" });
+
+            if (monthlyData[month] !== undefined) {
+                monthlyData[month] += Number(item.nominal) || 0;
+            }
+        });
+
+        setChartData(Object.entries(monthlyData).map(([name, Pengeluaran]) => ({
+            name,
+            Pengeluaran,
+            amt: Pengeluaran
+        })));
     };
-    
 
     return (
-        <Modal open={open} onClose={onClose} title="Tambah Data">
-            <form className="space-y-4" onSubmit={handleSubmit}>
-                {fields.map((field, index) => (
-                    <input
-                        key={index}
-                        type={field === "tanggal" ? "date" : "text"} // Pastikan input tanggal pakai type="date"
-                        name={field}
-                        placeholder={field}
-                        value={formData[field]}
-                        onChange={handleChange}
-                        className="w-full p-2 border rounded"
-                    />
-
-                ))}
-                <div className="flex justify-end space-x-2">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="px-4 py-2 text-sm text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="px-4 py-2 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
-                    >
-                        Submit
-                    </button>
-                </div>
-            </form>
-        </Modal>
+        <ResponsiveContainer width="90%" height={350}>
+            <AreaChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Area type="monotone" dataKey="Pengeluaran" stroke="#ff6b6b" fill="#ff6b6b" />
+            </AreaChart>
+        </ResponsiveContainer>
     );
 }
-
-export default AddView;

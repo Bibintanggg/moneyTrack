@@ -24,6 +24,7 @@ function Outcome() {
 
     useEffect(() => {
         localStorage.setItem("outcomeActivities", JSON.stringify(outcomeActivities));
+        updateChartData(outcomeActivities);
     }, [outcomeActivities]);
 
     const getNextId = () => {
@@ -50,6 +51,27 @@ function Outcome() {
     const handleDelete = (id) => {
         setOutcomeActivities(outcomeActivities.filter((activity) => activity.id !== id));
         setOpen({ ...open, delete: false });
+    };
+
+    // **Fungsi buat update localStorage data Chart**
+    const updateChartData = (activities) => {
+        const monthlyOutcome = {};
+
+        activities.forEach((activity) => {
+            const month = new Date(activity.tanggal).toLocaleString("id-ID", { month: "long" });
+
+            if (!monthlyOutcome[month]) {
+                monthlyOutcome[month] = 0;
+            }
+            monthlyOutcome[month] += parseFloat(activity.nominal);
+        });
+
+        const chartData = Object.keys(monthlyOutcome).map((month) => ({
+            name: month,
+            Pengeluaran: monthlyOutcome[month],
+        }));
+
+        localStorage.setItem("outcomeChartData", JSON.stringify(chartData));
     };
 
     return (
