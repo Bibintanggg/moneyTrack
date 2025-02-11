@@ -33,7 +33,7 @@ function Income() {
     };
 
     const handleAdd = (newActivity) => {
-        const formattedDate = new Date(newActivity.tanggal); // Pastikan ini objek Date
+        const formattedDate = new Date(newActivity.tanggal); 
 
         if (isNaN(formattedDate.getTime())) {
             alert("Format tanggal tidak valid!");
@@ -52,6 +52,7 @@ function Income() {
 
         setOpen({ ...open, add: false });
     };
+
 
 
 

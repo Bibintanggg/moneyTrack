@@ -27,9 +27,23 @@ function AddView({ open, onClose, onSubmit, fields }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         const isValid = fields.every((field) => formData[field]);
-
+    
         if (isValid) {
-            onSubmit({ ...formData, id: Date.now() });
+            const newData = { ...formData, id: Date.now() };
+    
+            // Ambil data lama dari localStorage
+            const existingData = JSON.parse(localStorage.getItem("incomeActivities")) || [];
+            const updatedData = [...existingData, newData];
+    
+            // Simpan ke localStorage
+            localStorage.setItem("incomeActivities", JSON.stringify(updatedData));
+    
+            // Trigger event storage agar chart ter-update
+            window.dispatchEvent(new Event("storage"));
+    
+            // Panggil onSubmit agar state utama juga update
+            onSubmit(newData);
+    
             Swal.fire({
                 position: "center",
                 icon: "success",
@@ -37,6 +51,7 @@ function AddView({ open, onClose, onSubmit, fields }) {
                 showConfirmButton: false,
                 timer: 1500,
             });
+    
             onClose();
         } else {
             Swal.fire({
@@ -48,6 +63,7 @@ function AddView({ open, onClose, onSubmit, fields }) {
             });
         }
     };
+    
 
     return (
         <Modal open={open} onClose={onClose} title="Tambah Data">
